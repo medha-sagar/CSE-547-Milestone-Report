@@ -62,22 +62,92 @@ In order to create a news recommendation engine, we needed news as well as user 
 
 Therefore, we decided to use Twitter data to understand how users interact with digital news entities on Twitter. 
 The twitter data used in our project was collected using the FakeNewsNet data repository. The repository contains information about tweets that contain news article information. These news articles are shared on Twitter via tweets and/or re-tweets. The repository collects news articles from two predominant websites:
-Gossipcop
-Politifact
+\begin{enumerate}
+\item GossipCop
+\item Politifact
+\end{enumerate}
 
 For the course of this project, we are focussing on news articles supplied by Politifact. Politifact is a non-profit fact checking website reporting on the accuracy of statements made by elected officials, candidates, their staffs, lobbyists, interest groups and others involved in U.S politics. The articles supplied by Politifact are predominantly related to the U.S Politics. 
 
 We will be using the news articles and its metadata collected by Politifact to extract features from the news articles. Additionally, we will be studying the tweets and the retweets of the articles to extract features that would be helpful in modeling user behavior. 
 
-Data Collection Process:
+\textbf{Data Collection Process}:\\
 
-Our data collection process starts by using the FakeNewsNet repository to collect information about news articles supplied by Politifact. 
+Our data collection process can be divided into two phases.
+
+\textbf{Phase I : Twitter Data Collection}\\
+Our data collection process starts by using the FakeNewsNet repository to collect information about news articles supplied by Politifact. Twitter API keys are used for collecting data from Twitter.
 Each news article has the following information:
-Article_ID : unique identifier of a news text
-Article_Text: the text of the article
-Article_Published_On: date on which the article was published
 
-Twitter API keys are used for collecting data from Twitter. The 
+\begin{enumerate}
+\item Article ID : unique identifier of a news text
+\item Article Text: the text of the article
+\item Article URL: the link to the article
+\item Article Keywords: keywords from the article
+\item Article Published On: date on which the article was published
+\item Tweet Info:
+\begin{itemize}
+\item Tweet ID: unique identifier for the tweet that contains the article
+\item Tweet Timestamp: timestamp when tweet was tweeted
+\item Tweet Retweet: no. of time the tweet was retweeted
+\item Tweet favorite: no. of timed tweet was favorited
+\item User Info:
+\begin{itemize}
+\item User ID: unique identifier for the user who tweeted about the article
+\item User Location: location of the user
+\item Follower Count: no. of followers the user has
+\item Friend Count: no. of friends the user has
+\item User Favourite Count: no. of favorite tweets
+\item User Status Count: user statuses count
+\end{itemize}
+\end{itemize}
+\item Retweet Info:
+\begin{itemize}
+\item Retweet ID: Unique Identifier for the retweet
+\item Retweet timestamp: timestamp when tweet was tweeted
+\item Retweet UserID: unique identifier of the user who retweeted the tweet
+\item User Info:
+\begin{itemize}
+\item User ID: unique identifier for the user who tweeted about the article
+\item User Location: location of the user
+\item Follower Count: no. of followers the user has
+\item Friend Count: no. of friends the user has
+\item User Favourite Count: no. of favorite tweets
+\item User Status Count: user statuses count
+\end{itemize}
+\end{itemize}
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{NeuRIPS2019/fakenews.png}
+    \caption{Data Hierarchy}
+    \label{Data Hierarchy}
+\end{figure}
+\textbf{Phase II : News Article Collection}\\
+In order to collect data for modeling the news article text, we used ‘All the News’ dataset on Kaggle which contains 143,000 news articles from 15 different American publications. 
+The motivation to use additional news data was to make a generalizable model for feature extraction on the textual article data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{NeuRIPS2019/all-the-news.png}
+    \caption{Distribution of News Articles and Publication}
+    \label{Distribution of News Articles and Publication}
+\end{figure}
+
+\textbf{Data Statistics}:
+Since, the data downloading time and the time required to parse the tweets is exorbitant, we report the following statistics as it stands:
+\begin{enumerate}
+    \item Total Number of Articles: 564
+    \item Total Number of Articles Processed: 285
+    \item Total Number of Tweets Processed: 239051
+    \item Total Users Processed Processed: 155353
+    \item Average Number of 
+\end{enumerate}
+
+
+
+
 
 \section{Exploratory Data Analysis}
 
@@ -109,16 +179,23 @@ Our next step was to use this data to model the topics for the external data. We
     \caption{Topic Number vs Coherence Score}
     \label{Topic Number vs Coherence Scorel}
 \end{figure}
-\\\\
+\\
+We notice that the optimum number of topics is 15. We create a LDA model with this hyper parameter. We get the following topics and the corresponding word weights.\\
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{NeuRIPS2019/words.PNG}
+    \caption{Word Weightage in Topics}
+    \label{Word Weightage in Topics}
+\end{figure}
 
-We notice that the optimum number of topics is 15. We create a LDA model with this hyper parameter. We can visualise the topics as well as the words which make up the topic.
+
+We can visualise the topics as well as the words which make up the topic.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.7]{poli.PNG}
     \caption{Visualisation to explore topics and keywords}
     \label{Visualisation to explore topics and keywords}
 \end{figure}
-\\
 
 Next we apply the model on the dataset of 515 news articles, to get the predominant topics in the dataset. Assigning the topic to with the maximum score to the document and plotting the count of documents for each topic gives the following graph:
 
@@ -128,9 +205,8 @@ Next we apply the model on the dataset of 515 news articles, to get the predomin
     \caption{Topic number vs Count of documents in news articles data}
     \label{Topic number vs Count of documents in news articles data}
 \end{figure}
-\\ 
 
-\\Thus we see that only 3 of the topics are pre-dominant in our document. By analysis of the keywords we see all three of these topics are related to politics. Also we observe that 2 and 9 are the topic numbers which are most  frequently occurring, which is consistent with Figure \ref{Visualisation to explore topics and keywords}. 
+Thus we see that only 3 of the topics are pre-dominant in our document. By analysis of the keywords we see all three of these topics are related to politics. Also we observe that 2 and 9 are the topic numbers which are most  frequently occurring, which is consistent with Figure \ref{Visualisation to explore topics and keywords}. 
 
 Also, we use k-means to find the distribution of the topics in the news articles data. First to find the optimum number of clusters in the data, we plot a SSE and number of clusters plot. We get the following graph:
 \begin{figure}[H]
@@ -223,10 +299,33 @@ interest_{u,0}(topic = c_i) \propto \displaystyle\frac{p_0(topic = t_i) \times \
 \end{aligned}
 \end{equation}
 
+Thus the Content-Based Filtering Score for a user $u$ and topic $c_i$ is $interest_{u,0}(topic = c_i)$. \\
+Note that offline we can precompute $N^t$ and $\displaystyle\frac{p_t(topic =c_i| article)}{p_t(topic = c_i)}$. Thus in real time we only have to calculate the $p_0(topic = c_i)$ i.e. the probability of a topic currently being in trend. \\
 
 \subsection{User clustering (Collaborative Filtering Component)}
 
+For clustering users based on retweet network, we must do the following steps:-
+
+\subsubsection{Create User Retweet Network}
+
+\begin{enumerate}
+\item Create a User-Tweet matrix $W$ where $W_{u, t} = \displaystyle\frac{1}{\textrm{number of retweets on the tweet $t$ by user $u$}}$
+\item Get user weights by finding the sum of each row in the $W$ matrix. Let this user weight matrix be $UW$.
+\item Create a User-User matrix where $U_{u1, u2} = \textrm{(Sum of (1/number of retweets) for each common retweet between user u1 and u2)}$ 
+\item Calculate the cosine similarity of each user link as $\displaystyle\frac{U_{u1, u2}}{UW_{u1} \times UW_{u2}}$.
+\item Create a graph G based with each user as a node and each edge is the link between each user with edge weight as the cosine similarity and edge value as the number of common retweets.
+\item Cluster the graph using the fast greedy algorithm. 
+\end{enumerate}
+
+Thus we get groups of users. Using the results of the LDA from the previous section, we can create a matrix $GC$ where $GC_{g, c_i} = \textrm{average of probabilities of category $c_i$ read by the users in user group $g$}$ \\
+
+We finally get the recommendation score based on Collaborative Filtering by using $GC_{g, c_i}$ where user $u$ belongs to user group $g$ and the article belongs to topic $c_i$.
 \subsection{Recommendation Generation Component}
+
+From the above two sections we saw how we can compute two recommendation scores for each news article for a user. Let the recommendation scores from the Content-Based Filtering component be $CF$ and Collaborative Filtering component be $CBF$. We can calculate a single recommendation score for each article as $CF \times CBF$. \\
+
+Finally using the recommendation scores for each article for each user, we can recommend the top news articles for any user. \\
+
 
 \section{Conclusion}
 
