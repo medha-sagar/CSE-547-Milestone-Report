@@ -27,6 +27,8 @@
 \usepackage{microtype}      % microtypography
 \usepackage{authblk}
 \usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
 \title{News Recommendation Engine}
 
 \author[1]{Ankita Pal\thanks{A.apal1994@uw.edu}}
@@ -56,7 +58,26 @@ Eventually to combine the recommendations, we will explore the use of a weighted
 
 \section{Data Collection}
 
-{Description of the data collection process}
+In order to create a news recommendation engine, we needed news as well as user data to model the user-item interactions. While there are many text corpuses for news article data, our literature surveys showed that there are no readily available data sources to collect user interactions with news items. 
+
+Therefore, we decided to use Twitter data to understand how users interact with digital news entities on Twitter. 
+The twitter data used in our project was collected using the FakeNewsNet data repository. The repository contains information about tweets that contain news article information. These news articles are shared on Twitter via tweets and/or re-tweets. The repository collects news articles from two predominant websites:
+Gossipcop
+Politifact
+
+For the course of this project, we are focussing on news articles supplied by Politifact. Politifact is a non-profit fact checking website reporting on the accuracy of statements made by elected officials, candidates, their staffs, lobbyists, interest groups and others involved in U.S politics. The articles supplied by Politifact are predominantly related to the U.S Politics. 
+
+We will be using the news articles and its metadata collected by Politifact to extract features from the news articles. Additionally, we will be studying the tweets and the retweets of the articles to extract features that would be helpful in modeling user behavior. 
+
+Data Collection Process:
+
+Our data collection process starts by using the FakeNewsNet repository to collect information about news articles supplied by Politifact. 
+Each news article has the following information:
+Article_ID : unique identifier of a news text
+Article_Text: the text of the article
+Article_Published_On: date on which the article was published
+
+Twitter API keys are used for collecting data from Twitter. The 
 
 \section{Exploratory Data Analysis}
 
@@ -136,12 +157,76 @@ Thus, we conclude that we need to further divide the topics into sub-topics for 
 
 \textbf{Understanding the relationship in the data:} The data is composed of users, tweets and news articles. The users are linked to tweets either by directly tweeting the articles or by retweeting the articles. Each tweet refers to a news article. \\
 
+The algorithm is divided into 3 major components. The description of the algorithm for each step is described below:- \\
 
-\subsection{Article profiling using LDA}
+\subsection{User Interest Modelling (Content-Based Filtering Component)}
 
-\subsection{User profiling using Clustering}
+\subsubsection{LDA for Topic Modelling}
 
-\subsection{Hybrid CF-CBF Algorithm for News Recommendation}
+For this component the first step is to generate classify the news articles into different categories (or topics). The purpose of this is to reduce the dimension space of the news articles and to group similar articles based on text mining. For creating these topics we will use hierarchical topic modelling since the news articles in our dataset are already known to be related to Politics. Thus we classify each news article under a topic $\{c_1, c_2, c_3 \textellipsis \}$. \\
+
+\subsubsection{User’s Genuine News Interest in Time Period $t$}
+
+The genuine interest of a user in a topic (categorized by LDA) is represented as follows:
+\begin{equation}
+\begin{aligned} 
+interest_{u,t}(topic = c_i) 
+& = p_t(article | topic = c_i) \\
+& = \frac{p_t(topic = c_i| article) p_t(article)}{p_t(topic = c_i)}
+\end{aligned}
+\end{equation}
+Where $p_t(topic = c_i| article) = \displaystyle \frac{\textrm{number of articles tweeted by user in topic $c_i$}}{\textrm{number of articles tweets by user (during time period $t$)}}$, \\
+$p_t(article) = \displaystyle \frac{\textrm{number of articles tweeted by user}}{\textrm{total number of articles (during time period $t$)}}$, \\
+$p_t(topic = c_i) = \displaystyle \frac{\textrm{number of articles in topic $c_i$}}{\textrm{number of articles during time period $t$}} $.
+
+
+\subsubsection{Combining interest with past trend}
+
+The overall interest of a user $u$ in topic $c_i$ is: \\
+\begin{equation}
+\begin{aligned}
+interest_u(topic = c_i) 
+& = \displaystyle \frac{\sum_{t}(N^t \times interest_{u,t}(topic = t_i)}{\sum_{t} N^t}	 \\
+& = \displaystyle\frac{\sum_{t} \left(N^t \times \displaystyle\frac{p_t(topic = c_i| article) p_t(article)}{p_t(topic = c_i)}\right)}{\sum_{t} N^t} \\
+\end{aligned}    
+\end{equation}
+
+Where $N^t =$ Number of articles tweeted by user in time period t. \\
+
+\subsubsection{Predicting the User’s Current News Interest}
+
+We represent the current time period with subscript $0$. Thus the interest at the current time period is as follows: \\
+
+\begin{equation}
+\begin{aligned}
+interest_{u,0}(topic = c_i) = \displaystyle\frac{p_0(article | topic = c_i) \times p_0(topic = t_i) }{p_0(article)}
+\end{aligned}  
+\end{equation}
+
+We estimate $p_0(article | topic = c_i)$ by $interest_u(topic = c_i)$. \\ Also, we assume the the probability of tweeting about any news article is constant. \\
+
+\begin{equation}
+\begin{aligned}
+\therefore interest_{u,0}(topic = c_i) 
+& \propto \displaystyle \frac{interest_u(topic = c_i) \times p_0(topic = t_i)}{p(article)} \\
+& \propto \displaystyle\frac{p_0(topic = t_i) \times \sum_{t} \left(N^t \times \displaystyle\frac{p_t(topic = c_i| article)}{p_t(topic = c_i)} \right)}{\sum_{t} N^t}
+\end{aligned}
+\end{equation}
+
+\subsubsection{Smoothing factor $G$}
+
+If the user is found to tweet very rarely or in the case of a new user (cold-start problem), we would like to approximate a user’s interest based on the current trend. Thus we add a smoothing factor G that act as virtual tweets. If $\sum_{t} N^t$ is much larger than $G$, then the interest approximates to the user’s real interest. However if it is very small, then the interest will approximate to the general current news trend. \\
+
+\begin{equation}
+\begin{aligned}
+interest_{u,0}(topic = c_i) \propto \displaystyle\frac{p_0(topic = t_i) \times \left(\sum_{t} \left(N^t \times \displaystyle\frac{p_t(topic = c_i| article)}{p_t(topic = c_i)}\right) + G\right)}{\sum_{t} N^t + G }
+\end{aligned}
+\end{equation}
+
+
+\subsection{User clustering (Collaborative Filtering Component)}
+
+\subsection{Recommendation Generation Component}
 
 \section{Conclusion}
 
