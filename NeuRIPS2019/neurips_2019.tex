@@ -49,6 +49,10 @@
 
 \section{Relevant Work}
 
+Amidst all the research done for recommendation systems, new recommendations have been one of the most challenging and relatively unexplored problems. In the domain of news recommender systems, there are 3 classes of recommendation algorithms- Collaborative Filtering (CF), Content-based Filtering (CBF) and hybrid algorithms. The paper [Saber et. al], proposes the use of building a hybrid recommendation algorithm. They view the problem in 2 phases - Modeling phase and Recommendation phase. The objective of the modelling phase is to pre-learn user and content models that serve to reduce the dimensionality as well as group similar users/articles together. These modellings are performed offline and stored prior to the recommendation phase. The recommendation phase occurs in real-time where based on a reader query, the results of the CF and CBF approaches are combined together to produce a set of recommendations. \\  
+In paper [Jiu et al.], the authors propose an interesting approach to calculate the recommendation score for the content filtering algorithm. The authors propose to compute the user’s interest in a category (or topic) based on the user’s overall interest in a topic and also the trend of interest for a topic over time. By combining these “long-term” and “short-term” effects, we can estimate the current interest of a user for a topic. In this project we will use a similar approach for the CBF recommendation. \\
+The paper [Uchida et al] recommends using retweet information to cluster tweets instead of tweet text. The reason was that the tweets are usually restricted to 280 characters and words are often abbreviated (modern text language) and contain special symbols like hashtags and emojis. Thus the paper proposed to calculate the similarity between tweets based on the overlap rate of users who retweeted them, creating a retweet network followed by clustering the tweets based on network clustering.  In this project we decided to use a similar approach to cluster the users based on a retweet network. This user modelling will be used in the CF recommendation approach. \\
+Eventually to combine the recommendations, we will explore the use of a weighted additive recommendation score or a multiplicative score as proposed in [Jiu et. al].
 
 \section{Data Collection}
 
@@ -130,10 +134,8 @@ Thus, we conclude that we need to further divide the topics into sub-topics for 
 
 \section{Algorithm}
 
-\begin{figure}[H]
-\includegraphics[scale=.40]{NeuRIPS2019/Slide1.PNG}
-\caption{Workflow}
-\end{figure}
+\textbf{Understanding the relationship in the data:} The data is composed of users, tweets and news articles. The users are linked to tweets either by directly tweeting the articles or by retweeting the articles. Each tweet refers to a news article. \\
+
 
 \subsection{Article profiling using LDA}
 
