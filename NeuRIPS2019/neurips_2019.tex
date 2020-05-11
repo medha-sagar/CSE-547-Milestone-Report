@@ -47,14 +47,14 @@
 
 \section{Introduction}
 
-{Thorough introduction of your problem}
+\textit{"Too many cooks spoil the broth"}~Jane Austen. Today the world is flooded and overwhelmed with news. According to MarketingProfs, more than 2 million articles are published everyday on the web. Finding the suitable article a user wants to read, in this overwhelming amount of news, would be a very tedious job in this scenario. Therefore, we decided to take up the development of a news recommendation engine. This recommendation engine uses user side information as well as the news article information and then passes it through a Collobarative Filtering and Content Based Filtering(CF-CBF), to recommend a news article to the user. We use hierarchical clustering to group the users into clusters based on the number of retweets. We use hierarchical Latent Dirichlet allocation (LDA) to find the most relevent topics within the news articles. The (CF-CBF) takes the results from these the clustering and LDA process and recommends a new-article based on the choice of the individual and topic of the article.
 
 \section{Relevant Work}
 
-Amidst all the research done for recommendation systems, new recommendations have been one of the most challenging and relatively unexplored problems. In the domain of news recommender systems, there are 3 classes of recommendation algorithms- Collaborative Filtering (CF), Content-based Filtering (CBF) and hybrid algorithms. The paper [Saber et. al], proposes the use of building a hybrid recommendation algorithm. They view the problem in 2 phases - Modeling phase and Recommendation phase. The objective of the modelling phase is to pre-learn user and content models that serve to reduce the dimensionality as well as group similar users/articles together. These modellings are performed offline and stored prior to the recommendation phase. The recommendation phase occurs in real-time where based on a reader query, the results of the CF and CBF approaches are combined together to produce a set of recommendations. \\  
-In paper [Jiu et al.], the authors propose an interesting approach to calculate the recommendation score for the content filtering algorithm. The authors propose to compute the user’s interest in a category (or topic) based on the user’s overall interest in a topic and also the trend of interest for a topic over time. By combining these “long-term” and “short-term” effects, we can estimate the current interest of a user for a topic. In this project we will use a similar approach for the CBF recommendation. \\
-The paper [Uchida et al] recommends using retweet information to cluster tweets instead of tweet text. The reason was that the tweets are usually restricted to 280 characters and words are often abbreviated (modern text language) and contain special symbols like hashtags and emojis. Thus the paper proposed to calculate the similarity between tweets based on the overlap rate of users who retweeted them, creating a retweet network followed by clustering the tweets based on network clustering.  In this project we decided to use a similar approach to cluster the users based on a retweet network. This user modelling will be used in the CF recommendation approach. \\
-Eventually to combine the recommendations, we will explore the use of a weighted additive recommendation score or a multiplicative score as proposed in [Jiu et. al].
+Amidst all the research done for recommendation systems, new recommendations have been one of the most challenging and relatively unexplored problems. In the domain of news recommender systems, there are 3 classes of recommendation algorithms- Collaborative Filtering (CF), Content-based Filtering (CBF) and hybrid algorithms. The paper \cite{ref1}, proposes the use of building a hybrid recommendation algorithm. They view the problem in 2 phases - Modeling phase and Recommendation phase. The objective of the modelling phase is to pre-learn user and content models that serve to reduce the dimensionality as well as group similar users/articles together. These modellings are performed offline and stored prior to the recommendation phase. The recommendation phase occurs in real-time where based on a reader query, the results of the CF and CBF approaches are combined together to produce a set of recommendations. \\  
+In paper \cite{CBFpaper}, the authors propose an interesting approach to calculate the recommendation score for the content filtering algorithm. The authors propose to compute the user’s interest in a category (or topic) based on the user’s overall interest in a topic and also the trend of interest for a topic over time. By combining these “long-term” and “short-term” effects, we can estimate the current interest of a user for a topic. In this project we will use a similar approach for the CBF recommendation. \\
+The paper \cite{userClustering} recommends using retweet information to cluster tweets instead of tweet text. The reason was that the tweets are usually restricted to 280 characters and words are often abbreviated (modern text language) and contain special symbols like hashtags and emojis. Thus the paper proposed to calculate the similarity between tweets based on the overlap rate of users who retweeted them, creating a retweet network followed by clustering the tweets based on network clustering.  In this project we decided to use a similar approach to cluster the users based on a retweet network. This user modelling will be used in the CF recommendation approach. \\
+Eventually to combine the recommendations, we will explore the use of a weighted additive recommendation score or a multiplicative score as proposed in \cite{CBFpaper}.
 
 \section{Data Collection}
 
@@ -69,13 +69,12 @@ The twitter data used in our project was collected using the FakeNewsNet data re
 
 For the course of this project, we are focussing on news articles supplied by Politifact. Politifact is a non-profit fact checking website reporting on the accuracy of statements made by elected officials, candidates, their staffs, lobbyists, interest groups and others involved in U.S politics. The articles supplied by Politifact are predominantly related to the U.S Politics. 
 
-We will be using the news articles and its metadata collected by Politifact to extract features from the news articles. Additionally, we will be studying the tweets and the retweets of the articles to extract features that would be helpful in modeling user behavior. 
+We will be using the news articles and its metadata collected by Politifact to extract features from the news articles. Additionally, we will be studying the tweets and the retweets of the articles to extract features that would be helpful in modeling user behavior. \\
 
-\textbf{Data Collection Process}:\\
-
+\subsection{Data Collection Process}:
 Our data collection process can be divided into two phases.
 
-\textbf{Phase I : Twitter Data Collection}\\
+\subsubsection{Phase I : Twitter Data Collection}
 Our data collection process starts by using the FakeNewsNet repository to collect information about news articles supplied by Politifact. Twitter API keys are used for collecting data from Twitter.
 Each news article has the following information:
 
@@ -124,7 +123,7 @@ Each news article has the following information:
     \caption{Data Hierarchy}
     \label{Data Hierarchy}
 \end{figure}
-\textbf{Phase II : News Article Collection}\\
+\subsubsection{Phase II : News Article Collection}
 In order to collect data for modeling the news article text, we used ‘All the News’ dataset on Kaggle which contains 143,000 news articles from 15 different American publications. 
 The motivation to use additional news data was to make a generalizable model for feature extraction on the textual article data.
 
@@ -137,16 +136,21 @@ The motivation to use additional news data was to make a generalizable model for
 
 \textbf{Data Statistics}:
 Since, the data downloading time and the time required to parse the tweets is exorbitant, we report the following statistics as it stands:
+
 \begin{enumerate}
-    \item Total Number of Articles: 564
-    \item Total Number of Articles Processed: 285
-    \item Total Number of Tweets Processed: 239051
-    \item Total Users Processed Processed: 155353
-    \item Average Number of 
-\end{enumerate}
+\item Total Number of Articles: 564
+\item Total Number of Articles Processed: 285
+\item Total Number of Tweets Processed: 239051
+\item Total Users Processed Processed: 155353
+\item Average Number of Tweets Per User: 3
+\end{enumerate}\\
 
+\textbf{Challenges:}\\
+\textbf{1. Absence of publicly available data}: As mentioned above, after rigorous literature review we realized that while there are many text corpora for news articles, there does not exist any publicly available dataset that captures the user interactions with news articles. Therefore, we had to create a dataset from scratch to collect the user interactions and news articles. We decided to leverage Twitter data to solve this problem. We have used tweets and retweets as a measure of interaction between users and digital news articles on Twitter.
 
+\textbf{2. Large Amount of Hierarchial Data}: For the scope of this project, we decided to just use Politifact news articles to model our recommendation engine. For a total of 564 news articles, we realized that the due to the hierarchical nature of Twitter data, the user-item interactions are huge. For example, for one article, we can have as many as 30,000 tweets for which we need to parse both the user information and the tweet information. Each of these 30,000 tweets can further have hundreds of retweets. Those retweets would again have to be aggregated along with their author information to create dense user networks. This leads to huge processing times to construct the data. In order to overcome the high computing cost, we are running our analysis and parsing using Google Cloud Platform.
 
+\textbf{2. Skew in News Articles}: Since, we are just using Politifact articles, we realized that creating LDA models using just the Politics related articles might lead to non-generalize results. T  
 
 
 \section{Exploratory Data Analysis}
@@ -154,16 +158,11 @@ Since, the data downloading time and the time required to parse the tweets is ex
 We start our EDA with the analysis of our news articles. We have a collection of 515 articles. For our EDA, we aim to analyse the topics present in our news articles data. \\
  For this, we train our data from an external data source and then analyse how it categorises the news articles. The data process for the same is: \\
 
-    
-
 \begin{figure}[H]
 \centering
-\includegraphics[scale=1]{lda_eda_process.PNG}
-
+\includegraphics[scale=0.6]{lda_eda_process.PNG}
 \caption{Workflow}
 \end{figure}
-
-
 
 For data prepossessing we use the steps including:
 \begin{itemize}
@@ -172,29 +171,22 @@ For data prepossessing we use the steps including:
     \item Making Bigrams 
     \item Lemmatization
 \end{itemize}
-Our next step was to use this data to model the topics for the external data. We plot the coherence score vs number of topics to help us get the optimum number of topics. 
+Our next step was to use this data to model the topics for the external data. We plot the coherence score vs number of topics to help us get the optimum number of topics.
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=1.5]{score.PNG}
     \caption{Topic Number vs Coherence Score}
     \label{Topic Number vs Coherence Scorel}
 \end{figure}
-\\
-We notice that the optimum number of topics is 15. We create a LDA model with this hyper parameter. We get the following topics and the corresponding word weights.\\
+
+We notice that the optimum number of topics is 15. We create a LDA model with this hyper parameter. We get the following topics and the corresponding word weights.
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.8]{NeuRIPS2019/words.PNG}
     \caption{Word Weightage in Topics}
     \label{Word Weightage in Topics}
-\end{figure}
-
-
-We can visualise the topics as well as the words which make up the topic.
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.7]{poli.PNG}
-    \caption{Visualisation to explore topics and keywords}
-    \label{Visualisation to explore topics and keywords}
 \end{figure}
 
 Next we apply the model on the dataset of 515 news articles, to get the predominant topics in the dataset. Assigning the topic to with the maximum score to the document and plotting the count of documents for each topic gives the following graph:
@@ -334,6 +326,11 @@ Finally using the recommendation scores for each article for each user, we can r
 
 \begin{thebibliography}{9}
 
-\bibitem{litReview} Çano, E.,\& Morisio, M.\ (2017). Hybrid recommender systems: A systematic literature review. {\it Intelligent Data Analysis}, 21(6), 1487-1524.
+\bibitem{ref1} Ismail, Walaa \& Nasr, Mona \& Saied, Mohamed. (2018). A HYBRID NEWS RECOMMENDER SYSTEM.
+
+\bibitem{CBFpaper} Liu, J., Dolan, P., & Pedersen, E. R. (2010, February). Personalized news recommendation based on click behavior. In Proceedings of the 15th international conference on Intelligent user interfaces (pp. 31-40).
+
+\bibitem{userClustering} Uchida, K., Toriumi, F., & Sakaki, T. (2017, August). Evaluation of retweet clustering method classification method using retweets on Twitter without text data. In Proceedings of the International Conference on Web Intelligence (pp. 187-194).
+
 \end{thebibliography}
 \end{document}
