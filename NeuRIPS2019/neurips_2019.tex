@@ -47,7 +47,7 @@
 
 \section{Introduction}
 
-\textit{"Too many cooks spoil the broth"}\~Jane Austen. Today the world is flooded and overwhelmed with news. According to MarketingProfs, more than 2 million articles are published everyday on the web. Finding the suitable article a user wants to read, in this overwhelming amount of news, would be a very tedious job in this scenario. Therefore, we decided to take up the development of a news recommendation engine. This recommendation engine uses user side information as well as the news article information and then passes it through a Collobarative Filtering and Content Based Filtering(CF-CBF), to recommend a news article to the user. We use hierarchical clustering to group the users into clusters based on the number of retweets. We use hierarchical Latent Dirichlet allocation (LDA) to find the most relevent topics within the news articles. The (CF-CBF) takes the results from these the clustering and LDA process and recommends a new-article based on the choice of the individual and topic of the article.
+\textit{"Too many cooks spoil the broth"}-Jane Austen.\\ Today the world is flooded and overwhelmed with news. According to our literature review, more than 2 million articles are published everyday on the web. Finding the suitable article a user wants to read, in this overwhelming amount of news, would be a very tedious job in this scenario. Therefore, we decided to take up the development of a news recommendation engine. This recommendation engine uses user side information as well as the news article information for a hybrid Collaborative Filtering and Content-Based Filtering(CF-CBF) approach, to recommend a news article to the user. We use hierarchical clustering to group the users into clusters based on the number of retweets. We find the topics preferred by user groups to get a CBF recommendation score. We use hierarchical Latent Dirichlet allocation (hLDA) to find the most relevant topics within the news articles. Combining time trends and user interests we find the time specific user interest for each topic, thus getting a CF recommendation score. Finally we take the two recommendation scores and combine them to a single score and recommend top news articles based on the choice of the individual and topic of the article.
 
 \section{Relevant Work}
 
@@ -61,7 +61,7 @@ Eventually to combine the recommendations, we will explore the use of a weighted
 In order to create a news recommendation engine, we needed news as well as user data to model the user-item interactions. While there are many text corpora for news article data, our literature surveys showed that there are no readily available data sources to collect user interactions with news items. 
 
 Therefore, we decided to use Twitter data to understand how users interact with digital news entities on Twitter. 
-The twitter data used in our project was collected using the FakeNewsNet \cite{fakenewsdata} data repository. The repository contains information about tweets that contain news article information. These news articles are shared on Twitter via tweets and/or re-tweets. The repository collects news articles from two predominant websites:
+The twitter data used in our project was collected using the FakeNewsNet \cite{fakenewsnet} data repository. The repository contains information about tweets that contain news article information. These news articles are shared on Twitter via tweets and/or re-tweets. The repository collects news articles from two predominant websites:
 \begin{enumerate}
 \item GossipCop
 \item Politifact
@@ -117,21 +117,21 @@ Each news article has the following information:
 \end{itemize}
 \end{enumerate}
 
-\begin{figure}[H]
+\begin{figure}
     \centering
-    \includegraphics[scale=0.5]{NeuRIPS2019/fakenews.png}
+    \includegraphics[scale=0.6]{NeuRIPS2019/fakenews.png}
     \caption{Data Hierarchy}
-    \label{Data Hierarchy}
+    \label{DataHierarchy}
 \end{figure}
 \subsubsection{Phase II : News Article Collection}
 In order to collect data for modeling the news article text, we used ‘All the News’ dataset on Kaggle \cite{allnewsdata} which contains 143,000 news articles from 15 different American publications. 
 The motivation to use additional news data was to make a generalizable model for feature extraction on the textual article data.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[scale=0.5]{NeuRIPS2019/all-the-news.png}
     \caption{Distribution of News Articles and Publication}
-    \label{Distribution of News Articles and Publication}
+    \label{NewsDistribution}
 \end{figure}
 
 \textbf{Data Statistics}:
@@ -147,19 +147,20 @@ Since, the data downloading time and the time required to parse the tweets is ex
 \textbf{Challenges:}\\
 \textbf{1. Absence of publicly available data}: As mentioned above, after rigorous literature review we realized that while there are many text corpora for news articles, there does not exist any publicly available dataset that captures the user interactions with news articles. Therefore, we had to create a dataset from scratch to collect the user interactions and news articles. We decided to leverage Twitter data to solve this problem. We have used tweets and retweets as a measure of interaction between users and digital news articles on Twitter.
 
-\textbf{2. Large Amount of Hierarchial Data}: For the scope of this project, we decided to just use Politifact news articles to model our recommendation engine. For a total of 515 news articles, we realized that the due to the hierarchical nature of Twitter data, the user-item interactions are huge. For example, for one article, we can have as many as 30,000 tweets for which we need to parse both the user information and the tweet information. Each of these 30,000 tweets can further have hundreds of retweets. Those retweets would again have to be aggregated along with their author information to create dense user networks. This leads to huge processing times to construct the data. In order to overcome the high computing cost, we are running our analysis and parsing using Google Cloud Platform.
+\textbf{2. Large Amount of Hierarchial Data}: For the scope of this project, we decided to just use Politifact news articles to model our recommendation engine. For a total of 515 news articles, we realized that the due to the hierarchical nature of Twitter data, the user-item interactions are huge. For example, for one article, we can have as many as 30,000 tweets for which we need to parse both the user information and the tweet information. Each of these 30,000 tweets can further have hundreds of retweets. Those retweets would again have to be aggregated along with their author information to create dense user networks. A representation of this hierarchy is depicted in Figure \ref{DataHierarchy}. This leads to huge processing times to construct the data. In order to overcome the high computing cost, we are running our analysis and parsing using Google Cloud Platform.
 
-\textbf{2. Skew in News Articles}: Since, we are just using Politifact articles, we realized that creating LDA models using just the Politics related articles might lead to non-generalize results. To overcome this issue, we used another dataset to train our LDA model. This article dataset contains 143,000 articles from 15 different American publications on various news topics.  
+\textbf{2. Skew in News Articles}: Since, we are just using Politifact articles, we realized that creating LDA models using just the Politics related articles might lead to non-generalize results. To overcome this issue, we used another dataset to train our LDA model. This article dataset contains 143,000 articles from 15 different American publications on various news topics. You can see the distribution of articles and publications in Figure \ref{NewsDistribution}. 
 
 \section{Exploratory Data Analysis}
 
 We start our EDA with the analysis of our news articles. We have a collection of 515 articles. For our EDA, we aim to analyse the topics present in our news articles data. \\
- For this, we train our data from an external data source and then analyse how it categorises the news articles. The data process for the same is: \\
+ For this, we train our data from an external data source\cite{allnewsdata} and then analyse how it categorises the news articles. The data process for the same is \ref{Workflow}: \\
 
-\begin{figure}[H]
+\begin{figure}
 \centering
 \includegraphics[scale=0.6]{lda_eda_process.PNG}
 \caption{Workflow}
+\label{Workflow}
 \end{figure}
 
 For data prepossessing we use the steps including:
@@ -170,27 +171,27 @@ For data prepossessing we use the steps including:
 \item Lemmatization
 \end{itemize}
 
-Our next step was to use this data to model the topics for the external data. We plot the coherence score vs number of topics to help us get the optimum number of topics.
+Our next step was to use this data to model the topics for the external data. We plot the coherence score vs number of topics to help us get the optimum number of topics in Figure \ref{Topic Number vs Coherence Scorel}.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[scale=1.5]{score.PNG}
     \caption{Topic Number vs Coherence Score}
     \label{Topic Number vs Coherence Scorel}
 \end{figure}
 
-We notice that the optimum number of topics is 15. We create a LDA model with this hyper parameter. We get the following topics and the corresponding word weights.
+We notice that the optimum number of topics is 15. We create a LDA model with this hyper parameter on the training data of \cite{allnewsdata}. We get the topics and the corresponding word weights as shown in Figure \ref{Word Weightage in Topics}.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[scale=0.8]{NeuRIPS2019/words.PNG}
     \caption{Word Weightage in Topics}
     \label{Word Weightage in Topics}
 \end{figure}
 
-Next we apply the model on the dataset of 515 news articles, to get the predominant topics in the dataset. Assigning the topic to with the maximum score to the document and plotting the count of documents for each topic gives the following graph:
+Next we apply the model on the dataset of 515 news articles, to get the predominant topics in the dataset. Assigning the topic with the maximum score to the document and plotting the count of documents for each topic gives the Figure \ref{Topic number vs Count of documents in news articles data}.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[scale=1]{dist.PNG}
     \caption{Topic number vs Count of documents in news articles data}
@@ -199,16 +200,16 @@ Next we apply the model on the dataset of 515 news articles, to get the predomin
 
 Thus we see that only 3 of the topics are pre-dominant in our document. By analysis of the keywords we see all three of these topics are related to politics. Also we observe that 2 and 9 are the topic numbers which are most  frequently occurring. 
 
-Also, we use k-means to find the distribution of the topics in the news articles data. First to find the optimum number of clusters in the data, we plot a SSE and number of clusters plot. We get the following graph:
-\begin{figure}[H]
+Also, we use k-means to find the distribution of the topics in the news articles data. First to find the optimum number of clusters in the data, we plot a SSE and number of clusters plot. We get the following graph as shown in Figure \ref{Number of clusters vs SSE}.
+\begin{figure}
     \centering
     \includegraphics[scale=1]{sse.PNG}
     \caption{Number of clusters vs SSE}
     \label{Number of clusters vs SSE}
 \end{figure}
 
-We find that the number of clusters is 3 and this is consistent with the find from figure \ref{Topic number vs Count of documents in news articles data}. The distribution of documents for among the cluster  is:
-\begin{figure}[H]
+We find that the number of clusters is 3 and this is consistent with the find from figure \ref{Topic number vs Count of documents in news articles data}. The distribution of documents for among the cluster  is shown in Figure \ref{Number of Documents in each cluster}
+\begin{figure}
     \centering
     \includegraphics{cluster.PNG}
     \caption{Number of Documents in each cluster}
@@ -224,7 +225,7 @@ Thus, we conclude that we need to further divide the topics into sub-topics for 
 
 \textbf{Understanding the relationship in the data:} The data is composed of users, tweets and news articles. The users are linked to tweets either by directly tweeting the articles or by retweeting the articles. Each tweet refers to a news article. \\
 
-The algorithm is divided into 3 major components. The description of the algorithm for each step is described below:- \\
+The algorithm is divided into 3 major components. The description of the algorithm for each step is described in the following sections. \\
 
 \subsection{User Interest Modelling (Content-Based Filtering Component)}
 
@@ -295,22 +296,22 @@ Note that offline we can precompute $N^t$ and $\displaystyle\frac{p_t(topic =c_i
 
 \subsection{User clustering (Collaborative Filtering Component)}
 
-For clustering users based on retweet network, we must do the following steps:-
+The following sections explain the algorithm for clustering users based on retweet networks.
 
 \subsubsection{Create User Retweet Network}
 
 \begin{enumerate}
 \item Create a User-Tweet matrix $W$ where $W_{u, t} = \displaystyle\frac{1}{\textrm{number of retweets on the tweet $t$ by user $u$}}$
-\item Get user weights by finding the sum of each row in the $W$ matrix. Let this user weight matrix be $UW$.
-\item Create a User-User matrix where $U_{u1, u2} = \textrm{(Sum of (1/number of retweets) for each common retweet between user u1 and u2)}$ 
-\item Calculate the cosine similarity of each user link as $\displaystyle\frac{U_{u1, u2}}{UW_{u1} \times UW_{u2}}$.
+\item Get user weights by finding the sum of each row in the $W$ matrix. Let this user weight matrix be $V$.
+\item Create a User-User matrix where $U_{u1, u2} =$ (Sum of $\left(\displaystyle\frac{1}{\textrm{number of retweets}}\right)$ for each common retweet between user $u1$ and $u2$) 
+\item Calculate the cosine similarity of each user link as $\displaystyle\frac{U_{u1, u2}}{V_{u1} \times V_{u2}}$.
 \item Create a graph G based with each user as a node and each edge is the link between each user with edge weight as the cosine similarity and edge value as the number of common retweets.
 \item Cluster the graph using the fast greedy algorithm. 
 \end{enumerate}
 
-Thus we get groups of users. Using the results of the LDA from the previous section, we can create a matrix $GC$ where $GC_{g, c_i} = \textrm{average of probabilities of category $c_i$ read by the users in user group $g$}$ \\
+Thus we get groups of users. Using the results of the LDA from the previous section, we can create an interaction matrix $I$ where $I_{g, c_i} = \textrm{average of probabilities of category $c_i$ read by the users in user group $g$}$ \\
 
-We finally get the recommendation score based on Collaborative Filtering by using $GC_{g, c_i}$ where user $u$ belongs to user group $g$ and the article belongs to topic $c_i$.
+We finally get the recommendation score based on Collaborative Filtering by using $I_{g, c_i}$ where user $u$ belongs to user group $g$ and the article belongs to topic $c_i$.
 \subsection{Recommendation Generation Component}
 
 From the above two sections we saw how we can compute two recommendation scores for each news article for a user. Let the recommendation scores from the Content-Based Filtering component be $CF$ and Collaborative Filtering component be $CBF$. We can calculate a single recommendation score for each article as $CF \times CBF$. \\
@@ -320,8 +321,7 @@ Finally using the recommendation scores for each article for each user, we can r
 
 \section{Conclusion}
 
-{Description of general difficulties with your problem which bear elaboration
-}
+In the current news recommendation systems, the major drawback lies in the absence of user interactions with news articles. Our literature survey shows most of the current systems are content based. This was a major motivation behind our project. We wanted to create a system that leverages both user and news data to generate recommendations. 
 
 \begin{thebibliography}{9}
 
@@ -331,8 +331,9 @@ Finally using the recommendation scores for each article for each user, we can r
 
 \bibitem{userClustering} Uchida, K., Toriumi, F., \& Sakaki, T. (2017, August). Evaluation of retweet clustering method classification method using retweets on Twitter without text data. In Proceedings of the International Conference on Web Intelligence (pp. 187-194).
 
-\bibitem{fakenewsnet} Shu, K., Mahudeswaran, D., Wang, S., Lee, D., & Liu, H. (2018). Fakenewsnet: A data repository with news content, social context and dynamic information for studying fake news on social media. arXiv preprint arXiv:1809.01286.
+\bibitem{fakenewsnet} Shu, K., Mahudeswaran, D., Wang, S., Lee, D., \& Liu, H. (2018). Fakenewsnet: A data repository with news content, social context and dynamic information for studying fake news on social media. arXiv preprint arXiv:1809.01286.
 
-\bibitem{allnewsdata} Mahudeswaran, D. (2018, November 2). FakeNewsNet. Retrieved from https://www.kaggle.com/mdepak/fakenewsnet#PolitiFact\_real\_news\_content.csv
+\bibitem{allnewsdata} Thompson, A. (2017, August 20). All the news. Retrieved from https://www.kaggle.com/snapcrack/all-the-news
+
 \end{thebibliography}
 \end{document}
